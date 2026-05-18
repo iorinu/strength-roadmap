@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { MIN_INCREMENT } from '../constants/exercises';
 import type {
   CalcResult,
   Difficulty,
@@ -109,7 +110,10 @@ export function calcMilestones(
   const setsReps = `${sets}×${reps}`;
 
   const round1 = (n: number) => Math.round(n * 10) / 10;
-  const goalRecommendedWeight = round1(targetMax * recommendedRatio);
+  const increment = MIN_INCREMENT[input.exercise];
+  const roundToIncrement = (w: number) =>
+    Math.round(w / increment) * increment;
+  const goalRecommendedWeight = roundToIncrement(targetMax * recommendedRatio);
 
   const milestones: Milestone[] = [];
   const idealLine: LinePoint[] = [{ week: 0, weight: currentMax }];
@@ -120,7 +124,7 @@ export function calcMilestones(
     milestones.push({
       week: n,
       targetMax: round1(max),
-      workingWeight: round1(max * intensityRatio),
+      workingWeight: roundToIncrement(max * intensityRatio),
       setsReps,
       status: difficulty,
     });
