@@ -26,6 +26,16 @@ function difficultyFromRatio(ratio: number): Difficulty {
   return 'very-hard';
 }
 
+// レップ数 → 推奨 1RM 比（Prilepin's Chart の reps/set ゾーン中央値）
+// 「N レップを複数セット持続可能な強度」の目安。1セット限界の RM 換算より少し控えめ。
+function recommendedRatioForReps(reps: number): number {
+  if (reps <= 2) return 0.88;   // 86–90% 域
+  if (reps <= 4) return 0.805;  // 76–85% 域
+  if (reps <= 6) return 0.725;  // 70–75% 域
+  if (reps <= 10) return 0.65;  // 筋肥大域
+  return 0.55;                  // 高レップ域
+}
+
 function diffInWeeks(fromIso: string, toIso: string): number {
   const from = new Date(fromIso);
   const to = new Date(toIso);
@@ -95,9 +105,11 @@ export function calcMilestones(
   const ratio = weeklyTarget / realisticWeeklyGain;
   const difficulty = difficultyFromRatio(ratio);
   const intensityRatio = currentSetWeight / currentMax;
+  const recommendedRatio = recommendedRatioForReps(reps);
   const setsReps = `${sets}×${reps}`;
 
   const round1 = (n: number) => Math.round(n * 10) / 10;
+  const goalRecommendedWeight = round1(targetMax * recommendedRatio);
 
   const milestones: Milestone[] = [];
   const idealLine: LinePoint[] = [{ week: 0, weight: currentMax }];
@@ -126,6 +138,8 @@ export function calcMilestones(
       weeklyGain: Math.round(weeklyTarget * 100) / 100,
       difficulty,
       intensityRatio,
+      recommendedRatio,
+      goalRecommendedWeight,
       milestones,
       idealLine,
       realisticLine,

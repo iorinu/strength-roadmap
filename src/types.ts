@@ -21,12 +21,14 @@ export type LinePoint = { week: number; weight: number };
 
 export type CalcResult = {
   totalWeeks: number;
-  weeklyGain: number;       // MAX の週あたり増量 (kg)
+  weeklyGain: number;          // MAX の週あたり増量 (kg)
   difficulty: Difficulty;
-  intensityRatio: number;   // 現在のセット重量 / 現在のMAX
+  intensityRatio: number;      // 現在のセット重量 / 現在のMAX（実際の強度比）
+  recommendedRatio: number;    // 入力レップ数に対する推奨 1RM 比（Prilepin ベース）
+  goalRecommendedWeight: number; // 目標 MAX × recommendedRatio（適正練習重量）
   milestones: Milestone[];
-  idealLine: LinePoint[];     // MAX ベース：入力目標ライン
-  realisticLine: LinePoint[]; // MAX ベース：経験レベル基準ライン
+  idealLine: LinePoint[];      // MAX ベース：入力目標ライン
+  realisticLine: LinePoint[];  // MAX ベース：経験レベル基準ライン
 };
 
 export type GoalInput = {
