@@ -6,8 +6,10 @@ import { calcMilestones, type CalcError } from './hooks/useCalcMilestones';
 import type { CalcResult, ExerciseId, ExperienceLevel } from './types';
 
 const ERROR_MESSAGE: Record<CalcError, string> = {
-  'invalid-weight': '重量は0より大きい数値を入力してください',
-  'no-gain': '目標重量は現在重量より大きくしてください',
+  'invalid-weight': 'MAX は 0 より大きい数値を入力してください',
+  'no-gain': '目標 MAX は現在 MAX より大きくしてください',
+  'invalid-set-weight': '現在のセット重量は MAX 以下の正の数値で入力してください',
+  'invalid-sets-reps': 'セット数・レップ数は 1 以上の整数で入力してください',
   'invalid-date': '達成日を入力してください',
   'past-date': '達成日は明日以降を指定してください',
 };
@@ -15,22 +17,34 @@ const ERROR_MESSAGE: Record<CalcError, string> = {
 function App() {
   const [exercise, setExercise] = useState<ExerciseId>('bench-press');
   const [level, setLevel] = useState<ExperienceLevel>('intermediate');
-  const [currentWeight, setCurrentWeight] = useState<number | ''>('');
-  const [targetWeight, setTargetWeight] = useState<number | ''>('');
+  const [currentMax, setCurrentMax] = useState<number | ''>('');
+  const [targetMax, setTargetMax] = useState<number | ''>('');
+  const [currentSetWeight, setCurrentSetWeight] = useState<number | ''>('');
+  const [sets, setSets] = useState<number | ''>('');
+  const [reps, setReps] = useState<number | ''>('');
   const [targetDate, setTargetDate] = useState('');
   const [result, setResult] = useState<CalcResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (currentWeight === '' || targetWeight === '') {
-      setErrorMessage('重量を入力してください');
+    if (
+      currentMax === '' ||
+      targetMax === '' ||
+      currentSetWeight === '' ||
+      sets === '' ||
+      reps === ''
+    ) {
+      setErrorMessage('すべての項目を入力してください');
       setResult(null);
       return;
     }
     const r = calcMilestones({
       exercise,
-      currentWeight,
-      targetWeight,
+      currentMax,
+      targetMax,
+      currentSetWeight,
+      sets,
+      reps,
       targetDate,
       level,
     });
@@ -50,13 +64,19 @@ function App() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
           <InputPanel
             exercise={exercise}
-            currentWeight={currentWeight}
-            targetWeight={targetWeight}
+            currentMax={currentMax}
+            targetMax={targetMax}
+            currentSetWeight={currentSetWeight}
+            sets={sets}
+            reps={reps}
             targetDate={targetDate}
             errorMessage={errorMessage}
             onExerciseChange={setExercise}
-            onCurrentWeightChange={setCurrentWeight}
-            onTargetWeightChange={setTargetWeight}
+            onCurrentMaxChange={setCurrentMax}
+            onTargetMaxChange={setTargetMax}
+            onCurrentSetWeightChange={setCurrentSetWeight}
+            onSetsChange={setSets}
+            onRepsChange={setReps}
             onTargetDateChange={setTargetDate}
             onSubmit={handleSubmit}
           />

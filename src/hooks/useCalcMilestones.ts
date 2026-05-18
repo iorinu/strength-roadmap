@@ -8,7 +8,7 @@ import type {
   Milestone,
 } from '../types';
 
-// 経験レベル別・週あたり伸び率（現在重量に対する % の中央値）
+// 経験レベル別・週あたり MAX 伸び率（現在 MAX に対する % の中央値）
 // 出典：Setgraph / Barbell Medicine 系の通説、筋力対数曲線
 //   - Novice: 2.5–5kg/session（週あたり ~2–5% on major lifts）
 //   - Intermediate: 1.25–2.5kg/1–2週（月で 5–10kg、週 ~0.5–1%）
@@ -18,23 +18,6 @@ const WEEKLY_GAIN_RATE: Record<ExperienceLevel, number> = {
   intermediate: 0.0075,
   advanced: 0.002,
 };
-
-// 強度（1RM比）→ セット×レップ（Prilepin's Chart ベース、軽量域は筋肥大向け）
-// 出典：Prilepin's Chart（旧ソ連 Prilepin 1000人超のエリート選手データ）
-const SETS_BY_INTENSITY: ReadonlyArray<{ max: number; label: string }> = [
-  { max: 0.7, label: '4×10' },
-  { max: 0.75, label: '5×5' },
-  { max: 0.85, label: '5×3' },
-  { max: 0.9, label: '4×2' },
-  { max: Infinity, label: '3×1' },
-];
-
-function pickSets(intensityRatio: number): string {
-  for (const tier of SETS_BY_INTENSITY) {
-    if (intensityRatio <= tier.max) return tier.label;
-  }
-  return SETS_BY_INTENSITY[SETS_BY_INTENSITY.length - 1].label;
-}
 
 function difficultyFromRatio(ratio: number): Difficulty {
   if (ratio <= 0.7) return 'easy';
@@ -62,23 +45,40 @@ export type CalcError =
   | 'invalid-date'
   | 'past-date'
   | 'invalid-weight'
-  | 'no-gain';
+  | 'no-gain'
+  | 'invalid-set-weight'
+  | 'invalid-sets-reps';
 
 export function calcMilestones(
   input: GoalInput,
 ): { ok: true; data: CalcResult } | { ok: false; error: CalcError } {
-  const { currentWeight, targetWeight, targetDate, level } = input;
+  const { currentMax, targetMax, currentSetWeight, sets, reps, targetDate, level } = input;
 
   if (
-    !Number.isFinite(currentWeight) ||
-    !Number.isFinite(targetWeight) ||
-    currentWeight <= 0 ||
-    targetWeight <= 0
+    !Number.isFinite(currentMax) ||
+    !Number.isFinite(targetMax) ||
+    currentMax <= 0 ||
+    targetMax <= 0
   ) {
     return { ok: false, error: 'invalid-weight' };
   }
-  if (targetWeight <= currentWeight) {
+  if (targetMax <= currentMax) {
     return { ok: false, error: 'no-gain' };
+  }
+  if (
+    !Number.isFinite(currentSetWeight) ||
+    currentSetWeight <= 0 ||
+    currentSetWeight > currentMax
+  ) {
+    return { ok: false, error: 'invalid-set-weight' };
+  }
+  if (
+    !Number.isInteger(sets) ||
+    !Number.isInteger(reps) ||
+    sets <= 0 ||
+    reps <= 0
+  ) {
+    return { ok: false, error: 'invalid-sets-reps' };
   }
   if (!targetDate) {
     return { ok: false, error: 'invalid-date' };
@@ -89,30 +89,33 @@ export function calcMilestones(
     return { ok: false, error: 'past-date' };
   }
 
-  const requiredGain = targetWeight - currentWeight;
+  const requiredGain = targetMax - currentMax;
   const weeklyTarget = requiredGain / totalWeeks;
-  const realisticWeeklyGain = currentWeight * WEEKLY_GAIN_RATE[level];
+  const realisticWeeklyGain = currentMax * WEEKLY_GAIN_RATE[level];
   const ratio = weeklyTarget / realisticWeeklyGain;
   const difficulty = difficultyFromRatio(ratio);
-  const weekStatus = difficulty;
+  const intensityRatio = currentSetWeight / currentMax;
+  const setsReps = `${sets}×${reps}`;
+
+  const round1 = (n: number) => Math.round(n * 10) / 10;
 
   const milestones: Milestone[] = [];
-  const idealLine: LinePoint[] = [{ week: 0, weight: currentWeight }];
-  const realisticLine: LinePoint[] = [{ week: 0, weight: currentWeight }];
+  const idealLine: LinePoint[] = [{ week: 0, weight: currentMax }];
+  const realisticLine: LinePoint[] = [{ week: 0, weight: currentMax }];
 
   for (let n = 1; n <= totalWeeks; n++) {
-    const milestoneWeight = currentWeight + weeklyTarget * n;
-    const intensityRatio = milestoneWeight / targetWeight;
+    const max = currentMax + weeklyTarget * n;
     milestones.push({
       week: n,
-      targetWeight: Math.round(milestoneWeight * 10) / 10,
-      recommendedSets: pickSets(intensityRatio),
-      status: weekStatus,
+      targetMax: round1(max),
+      workingWeight: round1(max * intensityRatio),
+      setsReps,
+      status: difficulty,
     });
-    idealLine.push({ week: n, weight: Math.round(milestoneWeight * 10) / 10 });
+    idealLine.push({ week: n, weight: round1(max) });
     realisticLine.push({
       week: n,
-      weight: Math.round((currentWeight + realisticWeeklyGain * n) * 10) / 10,
+      weight: round1(currentMax + realisticWeeklyGain * n),
     });
   }
 
@@ -122,6 +125,7 @@ export function calcMilestones(
       totalWeeks,
       weeklyGain: Math.round(weeklyTarget * 100) / 100,
       difficulty,
+      intensityRatio,
       milestones,
       idealLine,
       realisticLine,
