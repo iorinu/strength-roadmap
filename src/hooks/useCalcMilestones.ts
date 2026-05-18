@@ -27,14 +27,31 @@ function difficultyFromRatio(ratio: number): Difficulty {
   return 'very-hard';
 }
 
-// レップ数 → 推奨 1RM 比（Prilepin's Chart の reps/set ゾーン中央値）
-// 「N レップを複数セット持続可能な強度」の目安。1セット限界の RM 換算より少し控えめ。
+// レップ数 → 推奨 1RM 比
+// 出典：NSCA Training Load Chart (Landers, J. NSCA J 6(6):60-61, 1984)
+//   NSCA Essentials of Strength and Conditioning Table 17.7 に収録、CSCS 試験範囲。
+// 注意：セット数は加味しない「単発限界 RM」ベースの値。
+const NSCA_REPS_TO_1RM: Record<number, number> = {
+  1: 1.0,
+  2: 0.95,
+  3: 0.93,
+  4: 0.9,
+  5: 0.87,
+  6: 0.85,
+  7: 0.83,
+  8: 0.8,
+  9: 0.77,
+  10: 0.75,
+  11: 0.725, // 10 と 12 の線形補間（NSCA 表にはないが連続性のため）
+  12: 0.7,
+};
+
 function recommendedRatioForReps(reps: number): number {
-  if (reps <= 2) return 0.88;   // 86–90% 域
-  if (reps <= 4) return 0.805;  // 76–85% 域
-  if (reps <= 6) return 0.725;  // 70–75% 域
-  if (reps <= 10) return 0.65;  // 筋肥大域
-  return 0.55;                  // 高レップ域
+  if (reps <= 1) return 1.0;
+  const hit = NSCA_REPS_TO_1RM[reps];
+  if (hit !== undefined) return hit;
+  // 12 reps を超える場合は 1 rep ごとに 2.5pt 下げる外挿 (下限 50%)
+  return Math.max(0.5, 0.7 - 0.025 * (reps - 12));
 }
 
 function diffInWeeks(fromIso: string, toIso: string): number {

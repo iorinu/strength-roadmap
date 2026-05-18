@@ -68,6 +68,9 @@ export function MetricCards({ result }: Props) {
         <p className={`mt-2 text-sm ${strengthHint.color}`}>
           {strengthHint.label}
         </p>
+        <p className="mt-3 text-xs text-indigo-700/80">
+          ※ NSCA Training Load Chart (Landers, 1984) 準拠。レップ数のみで判定し、セット数は加味していません。
+        </p>
       </div>
     </div>
   );
