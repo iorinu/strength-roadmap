@@ -7,7 +7,30 @@ import type {
   GoalInput,
   LinePoint,
   Milestone,
+  ProgressCurve,
 } from '../types';
+
+// 週次の進度カーブ。n=0 で 0、n=totalWeeks で 1 になるよう正規化されている。
+// 線形以外は前半に多く伸ばし、後半は緩やかになる（実際の筋トレ伸びに近い対数的カーブ）。
+function progressAt(
+  n: number,
+  totalWeeks: number,
+  curve: ProgressCurve,
+): number {
+  if (n <= 0) return 0;
+  if (n >= totalWeeks) return 1;
+  const t = n / totalWeeks;
+  switch (curve) {
+    case 'linear':
+      return t;
+    case 'gentle':
+      return Math.pow(t, 0.85);
+    case 'standard':
+      return Math.log(1 + n) / Math.log(1 + totalWeeks);
+    case 'steep':
+      return Math.sqrt(t);
+  }
+}
 
 // 経験レベル別・週あたり MAX 伸び率（現在 MAX に対する % の中央値）
 // 出典：Setgraph / Barbell Medicine 系の通説、筋力対数曲線
@@ -80,7 +103,16 @@ export type CalcError =
 export function calcMilestones(
   input: GoalInput,
 ): { ok: true; data: CalcResult } | { ok: false; error: CalcError } {
-  const { currentMax, targetMax, currentSetWeight, sets, reps, targetDate, level } = input;
+  const {
+    currentMax,
+    targetMax,
+    currentSetWeight,
+    sets,
+    reps,
+    targetDate,
+    level,
+    progressCurve,
+  } = input;
 
   if (
     !Number.isFinite(currentMax) ||
@@ -137,7 +169,8 @@ export function calcMilestones(
   const realisticLine: LinePoint[] = [{ week: 0, weight: currentMax }];
 
   for (let n = 1; n <= totalWeeks; n++) {
-    const max = currentMax + weeklyTarget * n;
+    const max =
+      currentMax + requiredGain * progressAt(n, totalWeeks, progressCurve);
     milestones.push({
       week: n,
       targetMax: round1(max),

@@ -3,7 +3,12 @@ import { Header } from './components/Header';
 import { InputPanel } from './components/InputPanel';
 import { ResultPanel } from './components/ResultPanel';
 import { calcMilestones, type CalcError } from './hooks/useCalcMilestones';
-import type { CalcResult, ExerciseId, ExperienceLevel } from './types';
+import type {
+  CalcResult,
+  ExerciseId,
+  ExperienceLevel,
+  ProgressCurve,
+} from './types';
 
 const ERROR_MESSAGE: Record<CalcError, string> = {
   'invalid-weight': 'MAX は 0 より大きい数値を入力してください',
@@ -23,6 +28,7 @@ function App() {
   const [sets, setSets] = useState<number | ''>('');
   const [reps, setReps] = useState<number | ''>('');
   const [targetDate, setTargetDate] = useState('');
+  const [progressCurve, setProgressCurve] = useState<ProgressCurve>('linear');
   const [result, setResult] = useState<CalcResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -47,6 +53,7 @@ function App() {
       reps,
       targetDate,
       level,
+      progressCurve,
     });
     if (r.ok) {
       setErrorMessage(null);
@@ -70,6 +77,7 @@ function App() {
             sets={sets}
             reps={reps}
             targetDate={targetDate}
+            progressCurve={progressCurve}
             errorMessage={errorMessage}
             onExerciseChange={setExercise}
             onCurrentMaxChange={setCurrentMax}
@@ -78,6 +86,7 @@ function App() {
             onSetsChange={setSets}
             onRepsChange={setReps}
             onTargetDateChange={setTargetDate}
+            onProgressCurveChange={setProgressCurve}
             onSubmit={handleSubmit}
           />
           <ResultPanel result={result} />

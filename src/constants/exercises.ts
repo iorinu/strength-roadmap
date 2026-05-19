@@ -25,6 +25,13 @@ export const EXPERIENCE_LEVELS = [
   { id: 'advanced', name: '上級者（2年以上）' },
 ] as const;
 
+export const PROGRESS_CURVES = [
+  { id: 'linear', name: '線形（一定ペース）' },
+  { id: 'gentle', name: '弱い対数（前半やや多め）' },
+  { id: 'standard', name: '標準対数（前半多め）' },
+  { id: 'steep', name: '強い対数（前半に集中）' },
+] as const;
+
 export const DIFFICULTY_LABEL = {
   easy: '余裕',
   standard: '標準',

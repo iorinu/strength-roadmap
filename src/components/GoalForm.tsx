@@ -1,3 +1,6 @@
+import { PROGRESS_CURVES } from '../constants/exercises';
+import type { ProgressCurve } from '../types';
+
 type Props = {
   currentMax: number | '';
   targetMax: number | '';
@@ -5,6 +8,7 @@ type Props = {
   sets: number | '';
   reps: number | '';
   targetDate: string;
+  progressCurve: ProgressCurve;
   errorMessage: string | null;
   onCurrentMaxChange: (v: number | '') => void;
   onTargetMaxChange: (v: number | '') => void;
@@ -12,6 +16,7 @@ type Props = {
   onSetsChange: (v: number | '') => void;
   onRepsChange: (v: number | '') => void;
   onTargetDateChange: (v: string) => void;
+  onProgressCurveChange: (v: ProgressCurve) => void;
   onSubmit: () => void;
 };
 
@@ -111,6 +116,22 @@ export function GoalForm(props: Props) {
           onChange={(e) => props.onTargetDateChange(e.target.value)}
           className={inputClass}
         />
+      </div>
+      <div>
+        <label className={labelClass}>進度カーブ</label>
+        <select
+          value={props.progressCurve}
+          onChange={(e) =>
+            props.onProgressCurveChange(e.target.value as ProgressCurve)
+          }
+          className={inputClass}
+        >
+          {PROGRESS_CURVES.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </div>
       {props.errorMessage && (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">

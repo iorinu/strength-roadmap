@@ -1,5 +1,7 @@
 export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
 
+export type ProgressCurve = 'linear' | 'gentle' | 'standard' | 'steep';
+
 export type ExerciseId =
   | 'bench-press'
   | 'squat'
@@ -40,4 +42,5 @@ export type GoalInput = {
   reps: number;              // レップ数
   targetDate: string;        // ISO yyyy-mm-dd
   level: ExperienceLevel;
+  progressCurve: ProgressCurve; // 週次の進度カーブ
 };

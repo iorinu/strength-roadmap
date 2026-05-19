@@ -1,4 +1,4 @@
-import type { ExerciseId } from '../types';
+import type { ExerciseId, ProgressCurve } from '../types';
 import { ExerciseTabs } from './ExerciseTabs';
 import { GoalForm } from './GoalForm';
 
@@ -10,6 +10,7 @@ type Props = {
   sets: number | '';
   reps: number | '';
   targetDate: string;
+  progressCurve: ProgressCurve;
   errorMessage: string | null;
   onExerciseChange: (id: ExerciseId) => void;
   onCurrentMaxChange: (v: number | '') => void;
@@ -18,6 +19,7 @@ type Props = {
   onSetsChange: (v: number | '') => void;
   onRepsChange: (v: number | '') => void;
   onTargetDateChange: (v: string) => void;
+  onProgressCurveChange: (v: ProgressCurve) => void;
   onSubmit: () => void;
 };
 
@@ -32,6 +34,7 @@ export function InputPanel(props: Props) {
         sets={props.sets}
         reps={props.reps}
         targetDate={props.targetDate}
+        progressCurve={props.progressCurve}
         errorMessage={props.errorMessage}
         onCurrentMaxChange={props.onCurrentMaxChange}
         onTargetMaxChange={props.onTargetMaxChange}
@@ -39,6 +42,7 @@ export function InputPanel(props: Props) {
         onSetsChange={props.onSetsChange}
         onRepsChange={props.onRepsChange}
         onTargetDateChange={props.onTargetDateChange}
+        onProgressCurveChange={props.onProgressCurveChange}
         onSubmit={props.onSubmit}
       />
     </aside>
