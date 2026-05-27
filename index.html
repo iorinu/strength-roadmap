@@ -5,12 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="HZAcXe0MzDQpF9CYfGed_Ew5jzoGwUriatOxtBfCX-s" />
 
-    <title>strength-roadmap | 筋トレ目標から週別マイルストーンを逆算</title>
+    <title>strength-roadmap | 筋トレ目標 MAX から週別練習重量を逆算（1RM 計算ツール）</title>
     <meta
       name="description"
-      content="現在の MAX・目標 MAX・達成日を入力すると、NSCA の Training Load Chart に基づいて週ごとの練習重量と適正セットを逆算するダッシュボード。ベンチプレス・スクワット・デッドリフト・OHP・バーベルロウに対応。"
+      content="現在の 1RM・目標 MAX・達成日を入力すると、NSCA Training Load Chart に基づいて週ごとの練習重量・適正セット・レップ数を逆算するトレーニング計画ツール。ベンチプレス・スクワット・デッドリフト・OHP・バーベルロウのピリオダイゼーション（線形 / 対数進度）に対応し、結果は PNG / PDF で出力できます。"
+    />
+    <meta
+      name="keywords"
+      content="筋トレ, 1RM 計算, 1RM 換算, 目標重量 逆算, トレーニング計画, ピリオダイゼーション, ベンチプレス, スクワット, デッドリフト, OHP, バーベルロウ, NSCA, Training Load Chart, 週別 練習重量"
     />
     <meta name="theme-color" content="#4f46e5" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
     <link rel="canonical" href="https://strength-roadmap.vercel.app/" />
 
     <meta property="og:type" content="website" />
@@ -19,25 +24,113 @@
     <meta property="og:locale" content="ja_JP" />
     <meta
       property="og:title"
-      content="strength-roadmap | 筋トレ目標から週別マイルストーンを逆算"
+      content="strength-roadmap | 筋トレ目標 MAX から週別練習重量を逆算（1RM 計算ツール）"
     />
     <meta
       property="og:description"
-      content="現在の MAX・目標 MAX・達成日から、NSCA Training Load Chart に基づいて週別の練習重量を逆算するダッシュボード。"
+      content="現在の 1RM・目標 MAX・達成日から、NSCA Training Load Chart に基づいて週別の練習重量とセット・レップを逆算。ベンチ / スクワット / デッドリフト / OHP / バーベルロウ対応。"
     />
 
     <meta name="twitter:card" content="summary" />
     <meta
       name="twitter:title"
-      content="strength-roadmap | 筋トレ目標から週別マイルストーンを逆算"
+      content="strength-roadmap | 筋トレ目標 MAX から週別練習重量を逆算（1RM 計算ツール）"
     />
     <meta
       name="twitter:description"
-      content="現在の MAX・目標 MAX・達成日から、NSCA Training Load Chart に基づいて週別の練習重量を逆算するダッシュボード。"
+      content="現在の 1RM・目標 MAX・達成日から、NSCA Training Load Chart に基づいて週別の練習重量とセット・レップを逆算。"
     />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "strength-roadmap",
+            "url": "https://strength-roadmap.vercel.app/",
+            "applicationCategory": "HealthApplication",
+            "operatingSystem": "Any",
+            "inLanguage": "ja",
+            "description": "筋トレの現在 1RM・目標 MAX・達成日から、NSCA Training Load Chart に基づいて週別の練習重量と適正セット・レップを逆算するトレーニング計画ダッシュボード。",
+            "featureList": [
+              "1RM からの週別練習重量の逆算",
+              "ベンチプレス / スクワット / デッドリフト / OHP / バーベルロウに対応",
+              "線形 / 対数（弱・標準・強）の進度カーブ選択",
+              "結果の PNG / PDF エクスポート"
+            ],
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "JPY"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "strength-roadmap は何をするツールですか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "現在の 1RM、目標 MAX、達成希望日を入力すると、NSCA の Training Load Chart に基づいて達成までの週ごとの練習重量・セット数・レップ数を自動で逆算し、トレーニング計画として可視化するダッシュボードです。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "対応している種目は何ですか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "ベンチプレス、スクワット、デッドリフト、オーバーヘッドプレス（OHP）、バーベルロウの 5 種目に対応しています。種目ごとに最小増量（上半身 2.5kg / 下半身 5kg）で重量を丸めます。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "週別の進度カーブはどのように決まりますか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "線形・弱い対数・標準対数・強い対数の 4 種類から選択できます。いずれも正規化されており、最終週には設定した目標 MAX にぴったり到達するよう調整されます。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "計算ロジックの根拠は何ですか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "推奨 1RM 比は NSCA Training Load Chart（Landers 1984）を採用しています。練習重量は現在のセット重量÷現在 MAX の強度比を全週で固定したうえで、目標 MAX に対してスケールする方式です。"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <main style="max-width: 720px; margin: 0 auto; padding: 24px; font-family: system-ui, sans-serif; color: #0f172a;">
+        <h1>strength-roadmap — 筋トレ目標 MAX から週別練習重量を逆算</h1>
+        <p>
+          現在の 1RM・目標 MAX・達成日を入力すると、NSCA Training Load Chart に基づいて週ごとの練習重量と適正セット・レップを逆算するトレーニング計画ツールです。
+        </p>
+        <h2>対応種目</h2>
+        <ul>
+          <li>ベンチプレス</li>
+          <li>スクワット</li>
+          <li>デッドリフト</li>
+          <li>オーバーヘッドプレス（OHP）</li>
+          <li>バーベルロウ</li>
+        </ul>
+        <h2>主な機能</h2>
+        <ul>
+          <li>目標達成日までの週別マイルストーンを自動算出</li>
+          <li>線形 / 弱い対数 / 標準対数 / 強い対数の 4 種類の進度カーブ</li>
+          <li>結果の PNG / PDF エクスポート</li>
+        </ul>
+        <p>このアプリを利用するには JavaScript を有効にしてください。</p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
